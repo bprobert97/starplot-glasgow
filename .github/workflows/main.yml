@@ -20,7 +20,7 @@ jobs:
         pip install -r requirements.txt
     - name: Analyse the code with pylint
       run: |
-        pylint src/ accord_demo.py
+        pylint .
     - name: Run mypy static type checker
       run: |
         mypy .
