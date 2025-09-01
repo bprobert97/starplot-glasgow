@@ -25,6 +25,8 @@ markdown-it-py==4.0.0
 matplotlib==3.10.5
 mccabe==0.7.0
 mdurl==0.1.2
+mypy==1.17.1
+mypy_extensions==1.1.0
 networkx==3.5
 numpy==2.3.2
 packaging==25.0
