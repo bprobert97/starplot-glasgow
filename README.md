@@ -30,6 +30,7 @@ _A Horizon Star Plot from Glasgow_
 │
 ├── .gitignore               # Files/folders to ignore in Git
 ├── LICENSE.MD               # License file
+├── mypy.ini                 # Configuration for mypy
 ├── README.MD                # Project overview
 └── requirements.txt        # List of python package dependencies
 </pre>
