@@ -41,7 +41,7 @@ Follow these steps to set up the project in a Python virtual environment:
 
 1. **Clone the repository**
    ```bash
-   git clone
+   git clone https://github.com/bprobert97/starplot-glasgow.git
    ```
 
 2. **Create a virtual environment**
