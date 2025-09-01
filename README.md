@@ -4,11 +4,11 @@ Scripts in this repository generate images of the night sky as seen in Glasgow, 
 
 # Examples
 
-![A Zenith Star Plot from Glasgow](images\glasgow_zenith.png "A Zenith Star Plot from Glasgow")
+![A Zenith Star Plot from Glasgow](images/glasgow_zenith.png "A Zenith Star Plot from Glasgow")
 _A Zenith Star Plot from Glasgow_
 
 
-![A Horizon Star Plot from Glasgow](images\glasgow_horizon.png "A Horizon Star Plot from Glasgow")
+![A Horizon Star Plot from Glasgow](images/glasgow_horizon.png "A Horizon Star Plot from Glasgow")
 _A Horizon Star Plot from Glasgow_
 
 # Repository Layout
