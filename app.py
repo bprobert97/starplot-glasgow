@@ -68,7 +68,7 @@ mag_limit = st.sidebar.slider("Magnitude Limit", 1, 8, 5)
 
 # Extra option: fast vs HD
 quality = st.sidebar.radio("Quality", ["Fast (preview)", "HD (slower)"])
-RESOLUTION = 600 if quality == "Fast (preview)" else 1200
+RESOLUTION = 1200 if quality == "Fast (preview)" else 2400
 
 # Session state
 if "chart_bytes" not in st.session_state:
