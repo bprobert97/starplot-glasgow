@@ -29,6 +29,7 @@ _A Horizon Star Plot from Glasgow_
 │   └── glasgow_zenith.py            # Code for generating a zenith image
 │
 ├── .gitignore               # Files/folders to ignore in Git
+├── app.py                   # Code for running the streamlit web app
 ├── LICENSE.MD               # License file
 ├── mypy.ini                 # Configuration for mypy
 ├── README.MD                # Project overview
@@ -70,10 +71,10 @@ Follow these steps to set up the project in a Python virtual environment:
 
 # Usage
 
-To run the horizon generation, either:
-* In VSCode, right click `scripts/glasgow_horizon.py` and select `Run Python File in Terminal`
-* In a terminal, execute `py scripts/glasgow_horizon.py`
+To run the streamlist web app, in your terminal run:
 
-To run the zenith generation, either:
-* In VSCode, right click `scripts/glasgow_zenith.py` and select `Run Python File in Terminal`
-* In a terminal, execute `py scripts/glasgow_zenith.py`
+```bash
+   streamlit run app.py
+```
+
+This will then spin up a local instance of the web app.

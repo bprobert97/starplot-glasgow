@@ -19,6 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+import os
+from typing import Optional
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -26,49 +28,70 @@ from zoneinfo import ZoneInfo
 from starplot import HorizonPlot, Observer, _
 from starplot.styles import PlotStyle, extensions
 
+def make_horizon_plot(
+    output_path: str = "images/glasgow_horizon.png",
+    dt: Optional[datetime] = None,
+    mag_limit: int = 5) -> str:
+    """
+    Generate a horizon star ploy
 
-# Select timezone, date and time
-tz = ZoneInfo("Europe/London")
-dt = datetime.now(tz).replace(hour=20, minute=29, second=0)  # or choose a specific time
+    Args:
+    - output_path: The path the image will be exported to.
+    - dt: The Datetime object representing the desired time for
+    the star plot
+    - mag_limit: The magitude limit for stars displayed on
+    the star plot.
 
-# Set observer - in this case, Glasgow UK
-observer = Observer(
-    lat=55.8642,
-    lon=-4.2518,
-    dt=dt,
-)
+    Returns: The path for the created image.
+    """
 
-# Select styles
-style = PlotStyle().extend(
-    extensions.BLUE_GOLD,
-    extensions.MAP,
-    extensions.GRADIENT_BOLD_SUNSET,
-)
+    # Ensure images folder exists
+    os.makedirs("images", exist_ok=True)
 
-# Create plot
-p = HorizonPlot(
-    altitude=(0, 60),
-    azimuth=(135, 225),
-    observer=observer,
-    style=style,
-    resolution=3200,
-    scale=0.9,
-)
+    # Default: In Glasgow timezone
+    if dt is None:
+        tz = ZoneInfo("Europe/London")
+        dt = datetime.now(tz)
 
-# Add items to plot
-p.constellations()
-p.milky_way()
+    # Set observer (Glasgow, UK)
+    observer = Observer(
+        lat=55.8642,
+        lon=-4.2518,
+        dt=dt,
+    )
 
-p.stars(
-    where=[_.magnitude < 5],
-    where_labels=[_.magnitude < 2],
-    style__marker__symbol="star_4",
-)
+    # Select styles
+    style = PlotStyle().extend(
+        extensions.BLUE_GOLD,
+        extensions.MAP,
+        extensions.GRADIENT_BOLD_SUNSET,
+    )
 
-p.messier(where=[_.magnitude < 11], true_size=False, label_fn=lambda d: f"M{d.m}")
+    # Create horizon plot
+    p = HorizonPlot(
+        altitude=(0, 60),
+        azimuth=(135, 225),
+        observer=observer,
+        style=style,
+        resolution=1600,  # reduce size for faster rendering
+        scale=0.9,
+    )
 
-p.constellation_labels()
-p.horizon(labels={180: "SOUTH"})
+    # Add plot elements
+    p.constellations()
+    p.milky_way()
 
-# Export image
-p.export("images/glasgow_horizon.png", padding=0.1)
+    p.stars(
+        where=[_.magnitude < mag_limit],
+        where_labels=[_.magnitude < 2],
+        style__marker__symbol="star_4",
+    )
+
+    p.messier(where=[_.magnitude < 11], true_size=False, label_fn=lambda d: f"M{d.m}")
+    p.constellation_labels()
+    p.horizon(labels={180: "SOUTH"})
+
+    # Export image
+    p.export(output_path, padding=0.1)
+
+    return output_path
