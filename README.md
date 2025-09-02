@@ -2,6 +2,8 @@
 
 Scripts in this repository generate images of the night sky as seen in Glasgow, UK using the [Starplot](https://starplot.dev/) library.
 
+If you just want to generate plots, rather than contribute to the code, you can do so for free at: https://glasgow-starplot.streamlit.app/
+
 # Examples
 
 ![A Zenith Star Plot from Glasgow](images/glasgow_zenith.png "A Zenith Star Plot from Glasgow")
