@@ -1,0 +1,4 @@
+[server]
+headless = true
+enableCORS = false
+port = 10000  # Render will set PORT env var

@@ -19,10 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-
 import os
 import pathlib
-import tempfile
 import starplot
 import streamlit as st
 from datetime import datetime, date
@@ -30,10 +28,11 @@ from zoneinfo import ZoneInfo
 from scripts.glasgow_horizon import make_horizon_plot
 from scripts.glasgow_zenith import make_zenith_plot
 
-# Override the library path
-starplot_library_dir = pathlib.Path(tempfile.gettempdir()) / "starplot_library"
-os.makedirs(starplot_library_dir, exist_ok=True)
-starplot.data.library_path = starplot_library_dir
+# Writable folder for Starplot / DuckDB extensions
+starplot_writable = pathlib.Path("starplot_library")
+os.makedirs(starplot_writable, exist_ok=True)
+# redirect internal library
+starplot.data.library_path = starplot_writable
 
 
 st.title("🌌 Glasgow Starplot Viewer")
