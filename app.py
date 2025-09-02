@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import tempfile
 import streamlit as st
 from datetime import datetime, date
 from zoneinfo import ZoneInfo
@@ -28,8 +29,10 @@ from scripts.glasgow_horizon import make_horizon_plot
 from scripts.glasgow_zenith import make_zenith_plot
 
 # Fix DuckDB/Starplot permissions
-os.makedirs("duckdb_extensions", exist_ok=True)
-os.environ["IBIS_DUCKDB_LIBDIR"] = os.path.abspath("duckdb_extensions")
+duckdb_dir = os.path.join(tempfile.gettempdir(), "duckdb_extensions")
+os.makedirs(duckdb_dir, exist_ok=True)
+os.environ["IBIS_DUCKDB_LIBDIR"] = duckdb_dir
+os.environ["IBIS_DUCKDB_DATA_DIR"] = duckdb_dir
 
 
 st.title("🌌 Glasgow Starplot Viewer")
