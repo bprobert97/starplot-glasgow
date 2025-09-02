@@ -31,8 +31,7 @@ from starplot.styles import PlotStyle, extensions
 
 def make_horizon_plot(
     dt: Optional[datetime] = None,
-    mag_limit: int = 5,
-    resolution: int = 1600) -> bytes:
+    mag_limit: int = 5) -> bytes:
     """
     Generate a horizon star plot.
 
@@ -41,7 +40,6 @@ def make_horizon_plot(
     the star plot
     - mag_limit: The magitude limit for stars displayed on
     the star plot.
-    - resolution: image resolution
 
     Returns: The image in bytes
     """
@@ -91,7 +89,7 @@ def make_horizon_plot(
 
     # Export to in-memory buffer
     buf = io.BytesIO()
-    p.export(buf, format="png", dpi=resolution)
+    p.export(buf, format="png")
     buf.seek(0)
 
     return buf.getvalue()  # return PNG bytes
