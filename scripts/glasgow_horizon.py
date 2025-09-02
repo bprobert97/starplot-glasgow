@@ -31,7 +31,8 @@ from starplot.styles import PlotStyle, extensions
 
 def make_horizon_plot(
     dt: Optional[datetime] = None,
-    mag_limit: int = 5) -> bytes:
+    mag_limit: int = 5,
+    resolution: int = 1600) -> bytes:
     """
     Generate a horizon star plot.
 
@@ -40,6 +41,7 @@ def make_horizon_plot(
     the star plot
     - mag_limit: The magitude limit for stars displayed on
     the star plot.
+    - resolution: image resolution
 
     Returns: The image in bytes
     """
@@ -69,7 +71,7 @@ def make_horizon_plot(
         azimuth=(135, 225),
         observer=observer,
         style=style,
-        resolution=1600,  # reduce size for faster rendering
+        resolution=resolution,
         scale=0.9,
     )
 

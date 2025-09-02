@@ -31,7 +31,8 @@ from starplot import ZenithPlot, Observer, styles, _
 
 def make_zenith_plot(
     dt: Optional[datetime] = None,
-    mag_limit: int = 5) -> bytes:
+    mag_limit: int = 5,
+    resolution: int = 1600) -> bytes:
     """
     Generate a zenith star plot.
 
@@ -40,6 +41,7 @@ def make_zenith_plot(
     the star plot
     - mag_limit: The magitude limit for stars displayed on
     the star plot.
+    - resolution: image resolution
 
     Returns: The image in bytes
     """
@@ -65,7 +67,7 @@ def make_zenith_plot(
     # Create Zenith plot
     p = ZenithPlot(
         observer=observer,
-        resolution=1600,  # smaller for faster rendering
+        resolution=resolution,
         scale=0.9,
         style=style
     )

@@ -51,7 +51,6 @@ except Exception as e:
 # Streamlit App
 # ───────────────────────────────────────────────
 st.set_page_config(page_title="Glasgow Starplot Viewer", page_icon="🌌")
-
 st.title("🌌 Glasgow Starplot Viewer")
 
 # Sidebar: controls
@@ -60,26 +59,39 @@ obs_date = st.sidebar.date_input("Date", value=date.today())
 obs_time = st.sidebar.time_input("Time", value=datetime.now().time())
 mag_limit = st.sidebar.slider("Magnitude Limit", 1, 8, 5)
 
-# Session state to persist chart path
+# Extra option: fast vs HD
+quality = st.sidebar.radio("Quality", ["Fast (preview)", "HD (slower)"])
+resolution = 1200 if quality == "Fast (preview)" else 2400
+
+# Session state
 if "chart_bytes" not in st.session_state:
     st.session_state.chart_bytes = None
+
+
+# ───────────────────────────────────────────────
+# Cached chart generator
+# ───────────────────────────────────────────────
+@st.cache_data
+def generate_chart(plot_type, dt, mag_limit, resolution):
+    if plot_type == "Horizon":
+        return make_horizon_plot(dt=dt, mag_limit=mag_limit, resolution=resolution)
+    else:
+        return make_zenith_plot(dt=dt, mag_limit=mag_limit, resolution=resolution)
+
 
 # ───────────────────────────────────────────────
 # Generate chart button
 # ───────────────────────────────────────────────
-# Generate chart
 if st.sidebar.button("Generate Chart"):
     tz = ZoneInfo("Europe/London")
     dt = datetime.combine(obs_date, obs_time).replace(tzinfo=tz)
 
     with st.spinner("Generating chart, please wait..."):
-        if plot_type == "Horizon":
-            img_bytes = make_horizon_plot(dt=dt, mag_limit=mag_limit)
-        else:
-            img_bytes = make_zenith_plot(dt=dt, mag_limit=mag_limit)
+        img_bytes = generate_chart(plot_type, dt, mag_limit, resolution)
 
     st.session_state.chart_bytes = img_bytes
     st.success("✅ Chart generated!")
+
 
 # ───────────────────────────────────────────────
 # Display chart + download button
