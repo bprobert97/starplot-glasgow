@@ -4,7 +4,10 @@ Scripts in this repository generate images of the night sky as seen in Glasgow, 
 
 If you just want to generate plots, rather than contribute to the code, you can do so for free at: https://starplot-glasgow.onrender.com
 
+![A Screenshot from the Web App](images/website_screenshot.png "A Screenshot from the Web App")
+
 # Examples
+Below are some examples of the two types of plots you can create.
 
 ![A Zenith Star Plot from Glasgow](images/glasgow_zenith.png "A Zenith Star Plot from Glasgow")
 _A Zenith Star Plot from Glasgow_

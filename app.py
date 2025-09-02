@@ -54,6 +54,12 @@ except Exception as e: # pylint: disable=broad-exception-caught
 st.set_page_config(page_title="Glasgow Starplot Viewer", page_icon="🌌")
 st.title("🌌 Glasgow Starplot Viewer")
 
+# Add a note about generation time
+st.info(
+    "⚠️ Generating a chart can take up to **3 minutes** depending on your selections. "
+    "Please be patient while the image is being created."
+)
+
 # Sidebar: controls
 plot_type = st.sidebar.radio("Select Plot Type", ["Horizon", "Zenith"])
 obs_date = st.sidebar.date_input("Date", value=date.today())
@@ -62,7 +68,7 @@ mag_limit = st.sidebar.slider("Magnitude Limit", 1, 8, 5)
 
 # Extra option: fast vs HD
 quality = st.sidebar.radio("Quality", ["Fast (preview)", "HD (slower)"])
-RESOLUTION = 1200 if quality == "Fast (preview)" else 2400
+RESOLUTION = 600 if quality == "Fast (preview)" else 1200
 
 # Session state
 if "chart_bytes" not in st.session_state:
@@ -102,8 +108,7 @@ if st.sidebar.button("Generate Chart"):
     tz = ZoneInfo("Europe/London")
     dt = datetime.combine(obs_date, obs_time).replace(tzinfo=tz)
 
-    with st.spinner("Generating chart, please wait..."):
-        img_bytes = generate_chart(plot_type, dt, mag_limit, RESOLUTION)
+    img_bytes = generate_chart(plot_type, dt, mag_limit, RESOLUTION)
 
     st.session_state.chart_bytes = img_bytes
     st.success("✅ Chart generated!")
