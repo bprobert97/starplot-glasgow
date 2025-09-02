@@ -19,7 +19,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-import os
+
+import io
 from typing import Optional
 
 from datetime import datetime
@@ -29,24 +30,21 @@ from starplot import HorizonPlot, Observer, _
 from starplot.styles import PlotStyle, extensions
 
 def make_horizon_plot(
-    output_path: str = "images/glasgow_horizon.png",
     dt: Optional[datetime] = None,
-    mag_limit: int = 5) -> str:
+    mag_limit: int = 5,
+    resolution: int = 1600) -> bytes:
     """
-    Generate a horizon star ploy
+    Generate a horizon star plot.
 
     Args:
-    - output_path: The path the image will be exported to.
     - dt: The Datetime object representing the desired time for
     the star plot
     - mag_limit: The magitude limit for stars displayed on
     the star plot.
+    - resolution: image resolution
 
-    Returns: The path for the created image.
+    Returns: The image in bytes
     """
-
-    # Ensure images folder exists
-    os.makedirs("images", exist_ok=True)
 
     # Default: In Glasgow timezone
     if dt is None:
@@ -91,7 +89,9 @@ def make_horizon_plot(
     p.constellation_labels()
     p.horizon(labels={180: "SOUTH"})
 
-    # Export image
-    p.export(output_path, padding=0.1)
+    # Export to in-memory buffer
+    buf = io.BytesIO()
+    p.export(buf, format="png", resolution=resolution)
+    buf.seek(0)
 
-    return output_path
+    return buf.getvalue()  # return PNG bytes

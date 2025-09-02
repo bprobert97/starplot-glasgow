@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-import os
+import io
 from typing import Optional
 
 from datetime import datetime
@@ -30,24 +30,21 @@ from starplot import ZenithPlot, Observer, styles, _
 
 
 def make_zenith_plot(
-    output_path="images/glasgow_zenith.png",
     dt: Optional[datetime] = None,
-    mag_limit: int = 5) -> str:
+    mag_limit: int = 5,
+    resolution: int = 1600) -> bytes:
     """
-    Generate a zenith star ploy
+    Generate a zenith star plot.
 
     Args:
-    - output_path: The path the image will be exported to.
     - dt: The Datetime object representing the desired time for
     the star plot
     - mag_limit: The magitude limit for stars displayed on
     the star plot.
+    - resolution: image resolution
 
-    Returns: The path for the created image.
+    Returns: The image in bytes
     """
-
-    # Ensure images folder exists
-    os.makedirs("images", exist_ok=True)
 
     # Default: now in Glasgow timezone
     if dt is None:
@@ -81,8 +78,10 @@ def make_zenith_plot(
     p.horizon()
     p.constellation_labels()
 
-    # Export image
-    p.export(output_path, transparent=False)
+    # Export to in-memory buffer
+    buf = io.BytesIO()
+    p.export(buf, format="png", resolution=resolution)
+    buf.seek(0)
 
-    return output_path
+    return buf.getvalue()
 

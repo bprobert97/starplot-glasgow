@@ -61,57 +61,36 @@ obs_time = st.sidebar.time_input("Time", value=datetime.now().time())
 mag_limit = st.sidebar.slider("Magnitude Limit", 1, 8, 5)
 
 # Session state to persist chart path
-if "chart_path" not in st.session_state:
-    st.session_state.chart_path = None
-
-# ───────────────────────────────────────────────
-# Cached plot generator
-# ───────────────────────────────────────────────
-@st.cache_resource(show_spinner=False)
-def generate_plot(plot_type: str, dt: datetime, mag_limit: int) -> str:
-    """Generate and return path to starplot image."""
-    if plot_type == "Horizon":
-        return make_horizon_plot(
-            output_path="images/glasgow_horizon.png",
-            dt=dt,
-            mag_limit=mag_limit,
-            resolution=1600,  # smaller for speed
-        )
-    else:
-        return make_zenith_plot(
-            output_path="images/glasgow_zenith.png",
-            dt=dt,
-            mag_limit=mag_limit,
-            resolution=1600,  # smaller for speed
-        )
+if "chart_bytes" not in st.session_state:
+    st.session_state.chart_bytes = None
 
 # ───────────────────────────────────────────────
 # Generate chart button
 # ───────────────────────────────────────────────
+# Generate chart
 if st.sidebar.button("Generate Chart"):
     tz = ZoneInfo("Europe/London")
     dt = datetime.combine(obs_date, obs_time).replace(tzinfo=tz)
 
     with st.spinner("Generating chart, please wait..."):
-        path = generate_plot(plot_type, dt, mag_limit)
+        if plot_type == "Horizon":
+            img_bytes = make_horizon_plot(dt=dt, mag_limit=mag_limit)
+        else:
+            img_bytes = make_zenith_plot(dt=dt, mag_limit=mag_limit)
 
-    st.session_state.chart_path = path
+    st.session_state.chart_bytes = img_bytes
     st.success("✅ Chart generated!")
 
 # ───────────────────────────────────────────────
 # Display chart + download button
 # ───────────────────────────────────────────────
-if st.session_state.chart_path:
-    st.image(
-        st.session_state.chart_path,
-        caption=f"{plot_type} chart from Glasgow",
-        width="content",
-    )
+if st.session_state.chart_bytes:
+    st.image(st.session_state.chart_bytes,
+             caption=f"{plot_type} chart from Glasgow")
 
-    with open(st.session_state.chart_path, "rb") as f:
-        st.download_button(
-            label="⬇️ Download chart",
-            data=f,
-            file_name=f"glasgow_{plot_type.lower()}.png",
-            mime="image/png",
-        )
+    st.download_button(
+        label="⬇️ Download chart",
+        data=st.session_state.chart_bytes,
+        file_name=f"glasgow_{plot_type.lower()}.png",
+        mime="image/png",
+    )
