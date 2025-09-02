@@ -19,60 +19,99 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+
 import os
 import pathlib
 import starplot
 import streamlit as st
 from datetime import datetime, date
 from zoneinfo import ZoneInfo
+
+import starplot.data.constellations as condata
+import starplot.data.stars as stardata
+
 from scripts.glasgow_horizon import make_horizon_plot
 from scripts.glasgow_zenith import make_zenith_plot
 
-# Writable folder for Starplot / DuckDB extensions
+# ───────────────────────────────────────────────
+# Setup Starplot writable library (DuckDB extensions etc.)
+# ───────────────────────────────────────────────
 starplot_writable = pathlib.Path("starplot_library")
 os.makedirs(starplot_writable, exist_ok=True)
-# redirect internal library
 starplot.data.library_path = starplot_writable
 
+# Preload datasets to avoid slow first-run
+try:
+    condata.table()
+    stardata.table()
+except Exception as e:
+    print("Warning: preload failed:", e)
+
+# ───────────────────────────────────────────────
+# Streamlit App
+# ───────────────────────────────────────────────
+st.set_page_config(page_title="Glasgow Starplot Viewer", page_icon="🌌")
 
 st.title("🌌 Glasgow Starplot Viewer")
 
-# Sidebar: Plot type
+# Sidebar: controls
 plot_type = st.sidebar.radio("Select Plot Type", ["Horizon", "Zenith"])
-
-# Sidebar: Date and time
 obs_date = st.sidebar.date_input("Date", value=date.today())
 obs_time = st.sidebar.time_input("Time", value=datetime.now().time())
-
-# Magnitude limit (stars)
 mag_limit = st.sidebar.slider("Magnitude Limit", 1, 8, 5)
 
-# Ensure image remains displayed when download button pressed
+# Session state to persist chart path
 if "chart_path" not in st.session_state:
     st.session_state.chart_path = None
 
-# Generate chart
+# ───────────────────────────────────────────────
+# Cached plot generator
+# ───────────────────────────────────────────────
+@st.cache_resource(show_spinner=False)
+def generate_plot(plot_type: str, dt: datetime, mag_limit: int) -> str:
+    """Generate and return path to starplot image."""
+    if plot_type == "Horizon":
+        return make_horizon_plot(
+            output_path="images/glasgow_horizon.png",
+            dt=dt,
+            mag_limit=mag_limit,
+            resolution=1600,  # smaller for speed
+        )
+    else:
+        return make_zenith_plot(
+            output_path="images/glasgow_zenith.png",
+            dt=dt,
+            mag_limit=mag_limit,
+            resolution=1600,  # smaller for speed
+        )
+
+# ───────────────────────────────────────────────
+# Generate chart button
+# ───────────────────────────────────────────────
 if st.sidebar.button("Generate Chart"):
     tz = ZoneInfo("Europe/London")
     dt = datetime.combine(obs_date, obs_time).replace(tzinfo=tz)
 
     with st.spinner("Generating chart, please wait..."):
-        if plot_type == "Horizon":
-            path = make_horizon_plot(output_path="images/glasgow_horizon.png", dt=dt, mag_limit=mag_limit)
-        else:
-            path = make_zenith_plot(output_path="images/glasgow_zenith.png", dt=dt, mag_limit=mag_limit)
+        path = generate_plot(plot_type, dt, mag_limit)
 
-    st.session_state.chart_path = path  # store path in session state
-    st.success("Chart generated!")
+    st.session_state.chart_path = path
+    st.success("✅ Chart generated!")
 
-# Display the image if it exists in session state
+# ───────────────────────────────────────────────
+# Display chart + download button
+# ───────────────────────────────────────────────
 if st.session_state.chart_path:
-    st.image(st.session_state.chart_path, caption=f"{plot_type} chart from Glasgow", width="content")
+    st.image(
+        st.session_state.chart_path,
+        caption=f"{plot_type} chart from Glasgow",
+        width="content",
+    )
 
     with open(st.session_state.chart_path, "rb") as f:
         st.download_button(
-            label="Download chart",
+            label="⬇️ Download chart",
             data=f,
             file_name=f"glasgow_{plot_type.lower()}.png",
-            mime="image/png"
+            mime="image/png",
         )
