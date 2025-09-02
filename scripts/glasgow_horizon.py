@@ -91,7 +91,7 @@ def make_horizon_plot(
 
     # Export to in-memory buffer
     buf = io.BytesIO()
-    p.export(buf, format="png", resolution=resolution)
+    p.export(buf, format="png", dpi=resolution)
     buf.seek(0)
 
     return buf.getvalue()  # return PNG bytes
