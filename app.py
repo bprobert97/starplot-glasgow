@@ -22,11 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import pathlib
-import starplot
-import streamlit as st
 from datetime import datetime, date
 from zoneinfo import ZoneInfo
 
+import streamlit as st
+
+import starplot
 import starplot.data.constellations as condata
 import starplot.data.stars as stardata
 
@@ -44,7 +45,7 @@ starplot.data.library_path = starplot_writable
 try:
     condata.table()
     stardata.table()
-except Exception as e:
+except Exception as e: # pylint: disable=broad-exception-caught
     print("Warning: preload failed:", e)
 
 # ───────────────────────────────────────────────
@@ -61,7 +62,7 @@ mag_limit = st.sidebar.slider("Magnitude Limit", 1, 8, 5)
 
 # Extra option: fast vs HD
 quality = st.sidebar.radio("Quality", ["Fast (preview)", "HD (slower)"])
-resolution = 1200 if quality == "Fast (preview)" else 2400
+RESOLUTION = 1200 if quality == "Fast (preview)" else 2400
 
 # Session state
 if "chart_bytes" not in st.session_state:
@@ -72,11 +73,26 @@ if "chart_bytes" not in st.session_state:
 # Cached chart generator
 # ───────────────────────────────────────────────
 @st.cache_data
-def generate_chart(plot_type, dt, mag_limit, resolution):
-    if plot_type == "Horizon":
-        return make_horizon_plot(dt=dt, mag_limit=mag_limit, resolution=resolution)
-    else:
-        return make_zenith_plot(dt=dt, mag_limit=mag_limit, resolution=resolution)
+def generate_chart(plt_type: str,
+                   date_time: datetime,
+                   mag_lim: int,
+                   res: int) -> bytes:
+    """
+    Generate chart and cache for performance
+
+    Args:
+    - plt_type: Either Horizon or Zenith
+    - date_time: Datetime for the star plot
+    - mag_lim: The maximum magnitude for stars in the plot
+    - res: Resolution of the image
+
+    Returns:
+    - The image in bytes
+    """
+    if plt_type == "Horizon":
+        return make_horizon_plot(dt=date_time, mag_limit=mag_lim, resolution=res)
+
+    return make_zenith_plot(dt=date_time, mag_limit=mag_lim, resolution=res)
 
 
 # ───────────────────────────────────────────────
@@ -87,7 +103,7 @@ if st.sidebar.button("Generate Chart"):
     dt = datetime.combine(obs_date, obs_time).replace(tzinfo=tz)
 
     with st.spinner("Generating chart, please wait..."):
-        img_bytes = generate_chart(plot_type, dt, mag_limit, resolution)
+        img_bytes = generate_chart(plot_type, dt, mag_limit, RESOLUTION)
 
     st.session_state.chart_bytes = img_bytes
     st.success("✅ Chart generated!")

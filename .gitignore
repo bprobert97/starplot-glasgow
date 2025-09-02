@@ -1,2 +1,3 @@
 /venv
 scripts/__pycache__
+.mypy_cache/

@@ -84,4 +84,3 @@ def make_zenith_plot(
     buf.seek(0)
 
     return buf.getvalue()
-
